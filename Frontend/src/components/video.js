@@ -11,16 +11,17 @@ export default class Video extends Component {
     loaded: 0,
     duration: 0,
     playbackRate: 1.0,
-    loop: false
+    loop: true
   }
   ready = (e) =>{
     this.setState({ played: 500 }) 
+    this.props.videoLoaded(this.props.index)
   }
   render () {
     return (
     <ReactPlayer 
-        width='1500px'
-         height='800px'
+        width='1900px'
+         height='1000px'
          onReady={this.ready}
         {...this.state}
          />

@@ -3,11 +3,34 @@ import $ from "jquery";
 import style from "../main.scss";
 import config from '../config'
 import jquery from '../jquery'
-import { Video, StatusCircle, DefaultButton } from '../components'
+import { Video, StatusCircle, DefaultButton, DefaultHeader } from '../components'
 import { map , addIndex} from 'ramda'
-var createReactClass = require('create-react-class');
+import { setTimeout } from 'timers';
+const createReactClass = require('create-react-class');
+let pageLoaded = false;
 
-var mapIndexed = addIndex(map);
+
+///Append Loading Page
+const loadingPage = () => {
+  $('body').append('<div class="overlay-wrapper overlay">Loading Page...</div>');
+  $('body').append('<div class="overlay-wrapper overlay-top">Loading Page...</div>');
+  $('body').append('<div class="overlay-wrapper overlay-bottom">Loading Page...</div>');
+  //Animation
+  $('.overlay-top').addClass('overlay-animation')
+  $('.overlay-bottom').addClass('overlay-animation')
+}
+loadingPage();
+
+// Check that first video has loaded
+const videoLoaded = (index) => {
+  if (index == 0) {
+    setTimeout(() => {
+      $('.overlay-wrapper').remove()
+    }, 4000)
+  }
+}
+
+const mapIndexed = addIndex(map);
 const landingImages = mapIndexed((x, itr) => {
   const divStyle = {
     'zIndex': `-${itr}`
@@ -24,7 +47,7 @@ const landingImages = mapIndexed((x, itr) => {
           <DefaultButton/>
         </div>
       </div>
-      <Video key={itr} url={x.video} playing={true} />
+      <Video key={itr} index={itr} url={x.video} videoLoaded={videoLoaded} playing={true} />
     </div>
   )
 })(config.landingPageOptions)
@@ -32,9 +55,15 @@ const landingImages = mapIndexed((x, itr) => {
 const LandingPage = createReactClass({
   getInitialState () {
     return {
-      playVideo: false,
+      playVideo: true,
       iteration : 0
     };
+  },
+  componentDidMount () {
+    console.log('component did mount')
+  },
+  componentDidUpdate () {
+    console.log('component did update')
   },
   showSelectedVideo() {
     // Use jquery to iterate through videos using
@@ -50,6 +79,7 @@ const LandingPage = createReactClass({
   render() {
 	  return (
     <div className="landing-page">
+      <DefaultHeader />
       <StatusCircle/>
       {landingImages}
     </div> 
